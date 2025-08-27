@@ -1,0 +1,134 @@
+html, body {
+    height: 100%;
+    background-color: #000000;
+    overflow-x: hidden;
+    background-image: url("http://image.mail.edentyres.co.uk/lib/fe3d11717564047d7c1572/m/1/944375f2-735c-4c73-b6b3-ee6438647491.jpg"); 
+    background-position: center;
+    background-size: cover;
+}
+
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: #ED1C24 !important;
+}
+
+.logo {
+    width: 150px;
+}
+
+/* Overrride checkbox styles */
+.check {
+    border-radius: 50px;
+    padding: 100px !important;
+    width: 1em;
+    height: 1rem;
+    accent-color: #ed1c24;
+
+}
+
+
+
+
+p, label, .input-group-text {
+
+    font-size: 14px;
+}
+
+
+
+.button {
+  border:none;
+   
+}
+
+.button:hover {
+  background-color: #6b1013 !important;
+  transition: 0.5s;
+
+}
+
+
+.nav-title {
+  text-align:center;
+  color:#666666;
+  font-size: 24px;
+  font-weight:600;
+}
+
+
+
+
+.logo-section {
+  margin:0px;
+  background-color:#ffffff;
+  padding-bottom:0px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+} 
+
+
+
+.main-row {
+    background-color:#ffffff;
+    margin: 70px auto 70px auto;
+    max-width:700px;
+    border-radius:10px; 
+    padding: 20px;
+}
+
+h2 {
+    font-family:Arial;
+    font-weight:bold;
+    padding:20px 0px;
+    color: #666666;
+    
+}
+
+.red {
+    color: red;
+}
+
+
+.button {
+  background-color:#ed1c24;
+  color:#ffffff;
+  padding:15px 25px;
+  border-radius:5px;
+  margin: 10px 0px;
+  font-weight: 600;
+}
+
+  .footer {
+    background-color:#1b1b1b;
+    color: #fff; 
+    margin: 0;
+    text-align: center;
+    padding: 15px 0px;
+  }
+
+
+@media (min-width: 768px) {
+
+    p, label, .input-group-text {
+
+    font-size: 16px;
+}
+
+
+  body {
+    min-height: 100vh;
+    margin:0; }
+
+  .footer {
+    min-height:70px;
+  }
+
+  body {
+    display:flex;
+    flex-direction:column; }
+
+  .main {
+    flex:1; }
+
+
+}

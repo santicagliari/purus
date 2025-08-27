@@ -1,0 +1,193 @@
+%%[
+SET @contactId = _subscriberkey
+
+IF NOT EMPTY(@contactId) THEN
+
+/* fetch data from Sales Cloud to show in the form */
+
+SET @subscriberRows = RetrieveSalesforceObjects(
+   "Contact",
+   "Id,FirstName,LastName,Email,Newsletter__c,Events__c,Offers__c,HasOptedOutOfEmail",
+   "Id", "=", @contactId
+   )
+   
+  IF RowCount(@subscriberRows) > 0 THEN
+
+  SET @row = row(@subscriberRows,1)
+  SET @FirstName = field(@row,"FirstName")
+  SET @LastName = field(@row,"LastName")
+  SET @Email = field(@row,"Email")
+  SET @Newsletter = field(@row,"Newsletter__c")
+  SET @Events = field(@row,"Events__c")
+  SET @Offers = field(@row,"Offers__c")
+  SET @HasOptedOutOfEmail = field(@row,"HasOptedOutOfEmail")
+  
+  IF @Newsletter == true THEN SET @Newsletterchk = "checked" ENDIF
+  IF @Events == true THEN SET @Eventschk = "checked" ENDIF
+  IF @Offers == true THEN SET @Offerschk = "checked" ENDIF
+
+ELSE
+]%%
+
+Sorry, something went wrong (no records found).
+
+%%[
+ENDIF
+
+ELSE
+]%%
+
+Sorry, something went wrong (missing subscriber key).
+
+%%[
+ENDIF
+
+IF RequestParameter("submitted") == true AND RequestParameter("unsub") == true THEN
+
+  /* update contact in Sales Cloud */
+  SET @updateRecord = UpdateSingleSalesforceObject(
+      "Contact", @contactId,
+      "Newsletter__c", "false",
+      "Events__c", "false",
+      "Offers__c", "false",
+      "HasOptedOutOfEmail", "true"
+     )  
+  
+  /* log unsubscribe event to mark as unsubscribed in All Subscribers */
+  SET @reason = "Unsubscribed through custom subscription center"
+
+  SET @lue = CreateObject("ExecuteRequest")
+  SETObjectProperty(@lue,"Name","LogUnsubEvent")
+
+  SET @lue_prop = CreateObject("APIProperty")
+  SETObjectProperty(@lue_prop, "Name", "SubscriberKey")
+  SETObjectProperty(@lue_prop, "Value", @contactId)
+  AddObjectArrayItem(@lue, "Parameters", @lue_prop)
+
+  SET @lue_prop = CreateObject("APIProperty")
+  SETObjectProperty(@lue_prop, "Name", "Reason")
+  SETObjectProperty(@lue_prop, "Value", @reason)
+  AddObjectArrayItem(@lue, "Parameters", @lue_prop)
+
+  SET @lue_statusCode = InvokeExecute(@lue, @overallStatus, @requestId)
+
+ELSEIF RequestParameter("submitted") == true AND RequestParameter("sub") == true THEN
+
+  /* update contact in Sales Cloud */
+  SET @updateRecord = UpdateSingleSalesforceObject(
+      "Contact", @contactId,
+      "FirstName", RequestParameter("firstname"),
+      "LastName", RequestParameter("lastname"),
+      "Email", RequestParameter("email"),
+      "Newsletter__c", "true",
+      "Events__c", "true",
+      "Offers__c", "true",
+      "HasOptedOutOfEmail", "false"
+     )
+     
+   /* set subscriber status to active in All Subscribers */  
+   SET @email = RequestParameter("email")
+   
+   SET @Subscriber = CreateObject("Subscriber")
+   SetObjectProperty(@Subscriber, "SubscriberKey", @contactId)
+   SetObjectProperty(@Subscriber, "EmailAddress", @email)
+   SetObjectProperty(@Subscriber, "Status", "Active" )
+   SET @Status = InvokeUpdate(@Subscriber, @createErrDesc, @createErrNo, @createOpts)
+
+   /* fetch updated data to show in the form */
+   SET @subscriberRows = RetrieveSalesforceObjects(
+   "Contact",
+   "Id,FirstName,LastName,Email,Newsletter__c,Events__c,Offers__c,HasOptedOutOfEmail",
+   "Id", "=", @contactId
+   )
+
+  SET @row = row(@subscriberRows,1)
+  SET @FirstName = field(@row,"FirstName")
+  SET @LastName = field(@row,"LastName")
+  SET @Email = field(@row,"Email")
+  SET @Newsletter = field(@row,"Newsletter__c")
+  SET @Events = field(@row,"Events__c")
+  SET @Offers = field(@row,"Offers__c")
+  SET @HasOptedOutOfEmail = field(@row,"HasOptedOutOfEmail")
+  
+  IF @Newsletter == true THEN SET @Newsletterchk = "checked" ENDIF
+  IF @Events == true THEN SET @Eventschk = "checked" ENDIF
+  IF @Offers == true THEN SET @Offerschk = "checked" ENDIF 
+  
+ELSEIF RequestParameter("submitted") == true THEN
+
+  /* update contact */
+  SET @updateRecord = UpdateSingleSalesforceObject(
+      "Contact", @contactId,
+      "FirstName", RequestParameter("firstname"),
+      "LastName", RequestParameter("lastname"),
+      "Email", RequestParameter("email"),
+      "Newsletter__c", Iif(RequestParameter("newsletter") == "on", "true", "false"),
+      "Events__c", Iif(RequestParameter("events") == "on", "true", "false"),
+      "Offers__c", Iif(RequestParameter("offers") == "on", "true", "false")
+     )
+   
+   /* update email in All Subscribers list */  
+   IF RequestParameter("email") != AttributeValue("emailaddr") THEN
+   SET @email = RequestParameter("email")
+   SET @Subscriber = CreateObject("Subscriber")
+   SetObjectProperty(@Subscriber, "SubscriberKey", @contactId)
+   SetObjectProperty(@Subscriber, "EmailAddress", @email)
+   SET @Status = InvokeUpdate(@Subscriber, @createErrDesc, @createErrNo, @createOpts) 
+   ENDIF
+   
+ENDIF
+
+IF @HasOptedOutOfEmail == true THEN
+]%%
+
+ <h2>Update your profile:</h2>
+      <form action="%%=RequestParameter('PAGEURL')=%%" method="post">
+         <label>First name: </label><input type="text" name="firstname" value="%%=v(@FirstName)=%%"><br>
+         <label>Last name: </label><input type="text" name="lastname" value="%%=v(@LastName)=%%"><br>
+         <label>Email: </label><input type="text" name="email" value="%%=v(@Email)=%%"><br>
+       
+      <h2>Resubscribe</h2>
+        
+          You have unsubscribed from ALL publications from <i>%%member_busname%%</i>. If you wish to resubscribe, click the Resubscribe button below.
+         <input name="submitted" type="hidden" value="true"><br>
+         <input name="sub" type="hidden" value="true"><br><br>
+         <input type="submit" value="Resubscribe">
+      </form>
+
+%%[ELSEIF RequestParameter("submitted") == false AND NOT EMPTY(@contactId) AND RowCount(@subscriberRows) > 0 THEN]%%
+
+      <h2>Update your profile:</h2>
+      <form action="%%=RequestParameter('PAGEURL')=%%" method="post">
+         <label>First name: </label><input type="text" name="firstname" value="%%=v(@FirstName)=%%"><br>
+         <label>Last name: </label><input type="text" name="lastname" value="%%=v(@LastName)=%%"><br>
+         <label>Email: </label><input type="text" name="email" value="%%=v(@Email)=%%"><br>
+       
+      <h2>Update your subscriptions:</h2>
+
+         <label>Newsletter: </label><input name="newsletter" type="checkbox" %%=v(@Newsletterchk)=%%><br>
+         <label>Events: </label><input name="events" type="checkbox" %%=v(@Eventschk)=%%><br>
+         <label>Offers: </label><input name="offers" type="checkbox" %%=v(@Offerschk)=%%><br>
+         <input name="submitted" type="hidden" value="true"><br>
+         <input type="submit" value="Submit"></form>
+         <br><br>
+      
+      <h2>Unsubscribe From All</h2>
+       
+          If you wish to unsubscribe from ALL publications from <i>%%member_busname%%</i>, click the Unsubscribe From All button below.
+         <form action="%%=RequestParameter('PAGEURL')=%%" method="post">
+         <input name="submitted" type="hidden" value="true">  
+         <input name="unsub" type="hidden" value="true"><br>
+         <input type="submit" value="Unsubscribe From All"></form>       
+
+%%[ELSEIF RequestParameter("submitted") == true AND NOT EMPTY(@contactId) THEN]%%
+
+      <h2>Your profile has been updated.</h2>
+      
+        Go back to your profile.<br>
+        <form action="%%=RequestParameter('PAGEURL')=%%" method="post">
+          <br>
+         <input type="submit" value="Go Back"></form>   
+      
+        
+%%[ENDIF]%% 

@@ -4,13 +4,32 @@
 SET @SubscriberKey = _SubscriberKey
 SET @CurrentYear = Format(Now(), "yyyy")
 
-/* From Contacts We get HasOptedOutOfEmail and et4ae5__HasOptedOutOfMobile__c */
+/* From Contacts We get HasOptedOutOfEmail and et4ae5__HasOptedOutOfMobile__c and Status from Subscriber */
 
 SET @recordData = RetrieveSalesforceObjects("Contact", "HasOptedOutOfEmail, et4ae5__HasOptedOutOfMobile__c", "Id", "=", @SubscriberKey)
 
 IF RowCount(@recordData) > 0 THEN
     SET @HasOptedOutOfEmail = Field(Row(@recordData, 1), "HasOptedOutOfEmail")
     SET @HasOptedOutOfMobile = Field(Row(@recorddata, 1), "et4ae5__HasOptedOutOfMobile__c")
+ENDIF
+
+/* Get Subscription status from Subscriber */
+
+SET @rr = CreateObject("RetrieveRequest")
+SetObjectProperty(@rr, "ObjectType", "Subscriber")
+AddObjectArrayItem(@rr, "Properties", "Status")
+
+SET @filter = CreateObject("SimpleFilterPart")
+SetObjectProperty(@filter, "Property", "SubscriberKey")
+SetObjectProperty(@filter, "SimpleOperator", "equals")
+AddObjectArrayItem(@filter, "Value", @subscriberKey)
+
+SetObjectProperty(@rr, "Filter", @filter)
+
+SET @results = InvokeRetrieve(@rr)
+
+IF RowCount(@results) > 0 THEN
+  SET @subStatus = Field(Row(@results,1), "Status")
 ENDIF
 
 
@@ -191,7 +210,8 @@ h2 {
  <div style="background-color:red;color:#fff">
 <p style="padding:20px;">SubscriberKey: %%=v(@SubscriberKey)=%%<br>
 Has Opted Out of Email: %%=v(@HasOptedOutOfEmail)=%%<br>
-Has Opted Out of Mobile: %%=v(@HasOptedOutOfMobile)=%%</p>
+Has Opted Out of Mobile: %%=v(@HasOptedOutOfMobile)=%%<br>
+Subscriber Status: %%=v(@subStatus)=%% </p>
 
  </div>
 

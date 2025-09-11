@@ -43,6 +43,14 @@ IF @Submit == "true" THEN
   SET @checkAll = RequestParameter("checkAll")
 ENDIF
 
+IF @checkAll == "on" THEN
+  SET @Action = "Unsubscribe from Email And SMS"
+ELSEIF @checkEmail == "on" THEN
+  SET @Action = "Unsubscribe only from Email"
+ELSEIF @checkSMS == "on" THEN
+  SET @Action = "Unsubscribe only from SMS"
+ENDIF
+
 ]%%
 </span>
 
@@ -227,7 +235,8 @@ Subscriber Status: %%=v(@subStatus)=%%</p>
 SubscriberKey: %%=v(@SubscriberKey)=%%<br>
 Email Checkbox: %%=v(@checkEmail)=%%<br>
 SMS Checkbox: %%=v(@checkEmail)=%%<br>
-All Checkbox: %%=v(@checkAll)=%%
+All Checkbox: %%=v(@checkAll)=%%<br>
+Action: %%=v(@Action)=%%
 
 </p>
 

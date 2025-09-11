@@ -32,7 +32,16 @@ IF RowCount(@results) > 0 THEN
   SET @subStatus = Field(Row(@results,1), "Status")
 ENDIF
 
+/* Check Form Data POST Submission */
 
+SET @Submit = RequestParameter("Submit")
+
+IF @Submit == "true" THEN
+  SET @SubscriberKey = RequestParameter("SubscriberKey")
+  SET @checkEmail = RequestParameter("checkEmail")
+  SET @checkSMS = RequestParameter("checkSMS")
+  SET @checkEmail = RequestParameter("checkAll")
+ENDIF
 
 ]%%
 </span>
@@ -211,7 +220,18 @@ h2 {
 <p style="padding:20px;">SubscriberKey: %%=v(@SubscriberKey)=%%<br>
 Has Opted Out of Email: %%=v(@HasOptedOutOfEmail)=%%<br>
 Has Opted Out of Mobile: %%=v(@HasOptedOutOfMobile)=%%<br>
-Subscriber Status: %%=v(@subStatus)=%% </p>
+Subscriber Status: %%=v(@subStatus)=%%</p>
+
+%%[IF @Submit == "true" THEN ]%%
+<p style="padding:20px;">
+SubscriberKey: %%=v(@SubscriberKey)=%%<br>
+Email Checkbox: %%=v(@checkEmail)=%%<br>
+SMS Checkbox: %%=v(@checkEmail)=%%<br>
+All Checkbox: %%=v(@checkAll)=%%
+
+</p>
+
+%%[ ENDIF ]%%
 
  </div>
 
@@ -238,33 +258,26 @@ that are useful to you.</p>
       <h2>Update your preferences:</h2>
       <p>If you'd prefer not to receive MOT or Service reminders, or the occasional
 exclusive offer, you can update your preferences here.</p>
+<form method="post" action="https://cloud.mail.edentyres.co.uk/prefcenter" >
     <div >
-        <input type="checkbox" checked class="check">
+        <input type="checkbox" checked class="check" name="checkEmail">
         <label >Please unsubscribe me from emails</label>     
     </div>
     <div >
-        <input type="checkbox" checked class="check">
+        <input type="checkbox" checked class="check" name="checkSMS">
         <label class="form-check-label" for="exampleCheck1">Please unsubscribe me from text messages</label>     
     </div>
     <div >
-        <input type="checkbox" checked class="check">
+        <input type="checkbox" checked class="check" name="checkAll">
         <label class="form-check-label" for="exampleCheck1">Please unsubscribe me from everything.</label>     
     </div>
-
-
-    </div>
-
-    <form method="post" action="%%=v(@PostURL)=%%" >
-  
-
-
-
-      <div class="col-12 pt-2">
-          <button type="submit" class="button">Update Preferences</button>
-      </div>
-      <input type="hidden" name="SurveyForm" value="CreateSurvey">
-      <input type="hidden" name="SurveyId" value="%%=v(@UUID)=%%">
-    </form>
+  </div>
+  <div class="col-12 pt-2">
+    <button type="submit" class="button">Update Preferences</button>
+  </div>
+    <input type="hidden" name="Submit" value="true">
+    <input type="hidden" name="SubscriberKey" value="%%=v(@SubscriberKey)=%%">
+  </form>
   </div> 
 </div>    
 <!--End of Survey Creation Form--> 

@@ -45,6 +45,27 @@ ENDIF
 
 IF @checkAll == "on" THEN
   SET @Action = "Unsubscribe from Email And SMS"
+
+  /* log unsubscribe event to mark as unsubscribed in All Subscribers */
+  SET @reason = "Unsubscribed through custom subscription center"
+
+  SET @lue = CreateObject("ExecuteRequest")
+  SETObjectProperty(@lue,"Name","LogUnsubEvent")
+
+  SET @lue_prop = CreateObject("APIProperty")
+  SETObjectProperty(@lue_prop, "Name", "SubscriberKey")
+  SETObjectProperty(@lue_prop, "Value", @SubscriberKey)
+  AddObjectArrayItem(@lue, "Parameters", @lue_prop)
+
+  SET @lue_prop = CreateObject("APIProperty")
+  SETObjectProperty(@lue_prop, "Name", "Reason")
+  SETObjectProperty(@lue_prop, "Value", @reason)
+  AddObjectArrayItem(@lue, "Parameters", @lue_prop)
+
+  SET @lue_statusCode = InvokeExecute(@lue, @overallStatus, @requestId)
+
+
+
 ELSEIF @checkEmail == "on" THEN
   SET @Action = "Unsubscribe only from Email"
 ELSEIF @checkSMS == "on" THEN

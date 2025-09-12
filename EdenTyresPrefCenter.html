@@ -101,7 +101,8 @@ IF @ALLUnsubscribe == "on" THEN
 
   SET @updateRecord = UpdateSingleSalesforceObject(
       "Contact", @SubscriberKey,
-      "et4ae5__HasOptedOutOfMobile__c", "true"
+      "et4ae5__HasOptedOutOfMobile__c", "true",
+      "HasOptedOutOfEmail", "true"
      )
 
 ELSEIF @EmailUnsubscribe == "on" THEN
@@ -125,11 +126,6 @@ ELSEIF @EmailUnsubscribe == "on" THEN
 
   SET @lue_statusCode = InvokeExecute(@lue, @overallStatus, @requestId)
 
-  set @updateRecord = UpdateSingleSalesforceObject(
-      "Contact", @SubscriberKey,
-      "et4ae5__HasOptedOutOfMobile__c", "true"
-     )
-
 ELSEIF @SMSUnsubscribe == "on" THEN
   SET @Action = "Unsubscribe only from SMS"
 
@@ -147,9 +143,10 @@ ELSEIF @AllResubscribe == "on" THEN
    SetObjectProperty(@Subscriber, "Status", "Active" )
    SET @Status = InvokeUpdate(@Subscriber, @createErrDesc, @createErrNo, @createOpts)
 
-  SET @updateRecord = UpdateSingleSalesforceObject(
+    SET @updateRecord = UpdateSingleSalesforceObject(
       "Contact", @SubscriberKey,
-      "et4ae5__HasOptedOutOfMobile__c", "false"
+      "et4ae5__HasOptedOutOfMobile__c", "false",
+      "HasOptedOutOfEmail", "false"
      )
 
 
@@ -166,7 +163,7 @@ ELSEIF @SMSResubscribe == "on" THEN
 
    SET @updateRecord = UpdateSingleSalesforceObject(
       "Contact", @SubscriberKey,
-      "et4ae5__HasOptedOutOfMobile__c", "false"
+      "HasOptedOutOfEmail", "false"
      )
 ENDIF
 

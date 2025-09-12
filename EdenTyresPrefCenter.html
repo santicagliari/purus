@@ -3,7 +3,7 @@
 
 SET @SubscriberKey = _SubscriberKey
 SET @CurrentYear = Format(Now(), "yyyy")
-SET  @Email = emailaddr
+SET @Email = emailaddr
 
 /* From Contacts We get HasOptedOutOfEmail and et4ae5__HasOptedOutOfMobile__c and Status from Subscriber */
 
@@ -66,6 +66,11 @@ IF @checkAll == "on" THEN
   AddObjectArrayItem(@lue, "Parameters", @lue_prop)
 
   SET @lue_statusCode = InvokeExecute(@lue, @overallStatus, @requestId)
+
+  set @updateRecord = UpdateSingleSalesforceObject(
+      "Contact", @SubscriberKey,
+      "et4ae5__HasOptedOutOfMobile__c", "true"
+     )
 
 
 
@@ -272,7 +277,9 @@ Action: %%=v(@Action)=%%
 
 <!-- End of Preview Testing Data -->
 
-<!-- Survey Creation Form -->
+
+%%[ IF @Submit != "true"  ]%%
+<!-- Profile Center Form -->
 <div class="container p-4 main" >
   <div class="row main-row">
     <div class="col-12 pt-4" >
@@ -315,7 +322,20 @@ exclusive offer, you can update your preferences here.</p>
   </form>
   </div> 
 </div>    
-<!--End of Survey Creation Form--> 
+<!--End of Profile Center Form--> 
+%%[ ELSE ]
+<!-- Profile Center Form -->
+<div class="container p-4 main" >
+  <div class="row main-row">
+    <div class="col-12 pt-4" >
+      <h2>Thank you!</h2>
+      <p>Your preferences have been updated!</p>
+    </div>
+  </div>  
+</div>
+<!--End of Profile Center Form--> 
+%%[ ENDIF ]%%
+
 
 <div class="container-full footer" >
   <div class="row">

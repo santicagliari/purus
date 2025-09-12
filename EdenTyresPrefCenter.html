@@ -33,6 +33,37 @@ IF RowCount(@results) > 0 THEN
   SET @subStatus = Field(Row(@results,1), "Status")
 ENDIF
 
+
+/* Define Checkboxes values */
+
+IF @subStatus == "Unsubscribed" THEN
+  SET @CheckEmailName = "EmailResubscribe"
+  SET @CheckEmailLabel = "Please resubscribe me to emails"
+ELSE
+  SET @CheckEmailName = "EmailUnsubscribe"
+  SET @CheckEmailLabel = "Please unsubscribe me from emails"
+ENDIF
+
+IF @HasOptedOutOfMobile == "true" THEN
+  SET @CheckSMSName = "SMSResubscribe"
+  SET @CheckSMSLabel = "Please resubscribe me to text messages"
+ELSE
+  SET @CheckSMSName = "SMSUnsubscribe"
+  SET @CheckSMSLabel = "Please unsubscribe me from text messages"
+ENDIF
+
+IF @subStatus == "Unsubscribed" AND @HasOptedOutOfMobile == "true" THEN
+  SET @CheckAllName = "ALLResubscribe"
+  SET @CheckAllLabel = "Please resubscribe me to everything"
+ELSE
+  SET @CheckAllName = "ALLUnsubscribe"
+  SET @CheckAllLabel = "Please unsubscribe me from everything"
+ENDIF
+
+
+
+
+
 /* Check Form Data POST Submission */
 
 SET @Submit = RequestParameter("Submit")
@@ -279,6 +310,7 @@ Action: %%=v(@Action)=%%
 
 
 %%[ IF @Submit != "true" THEN ]%%
+
 <!-- Profile Center Form -->
 <div class="container p-4 main" >
   <div class="row main-row">
@@ -302,16 +334,16 @@ that are useful to you.</p>
 exclusive offer, you can update your preferences here.</p>
 <form method="post" action="https://cloud.mail.edentyres.co.uk/prefcenter" >
     <div >
-        <input type="checkbox" checked class="check" name="checkEmail">
-        <label >Please unsubscribe me from emails</label>     
+        <input type="checkbox" checked class="check" name="%%=v(@CheckEmailName)=%%">
+        <label >%%=v(@CheckEmailLabel)=%%</label>     
     </div>
     <div >
-        <input type="checkbox" checked class="check" name="checkSMS">
-        <label class="form-check-label" for="exampleCheck1">Please unsubscribe me from text messages</label>     
+        <input type="checkbox" checked class="check" name="%%=v(@CheckSMSName)=%%">
+        <label class="form-check-label" for="exampleCheck1">%%=v(@CheckSMSLabel)=%%</label>     
     </div>
     <div >
-        <input type="checkbox" checked class="check" name="checkAll">
-        <label class="form-check-label" for="exampleCheck1">Please unsubscribe me from everything.</label>     
+        <input type="checkbox" checked class="check" name="%%=v(@CheckAllName)=%%">
+        <label class="form-check-label" for="exampleCheck1">%%=v(@CheckAllLabel)=%%</label>     
     </div>
   </div>
   <div class="col-12 pt-2">
@@ -323,6 +355,10 @@ exclusive offer, you can update your preferences here.</p>
   </div> 
 </div>    
 <!--End of Profile Center Form--> 
+
+
+
+
 %%[ ELSE ]%%
 <!-- Profile Center Form -->
 <div class="container p-4 main" >

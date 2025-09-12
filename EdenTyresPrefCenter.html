@@ -3,6 +3,7 @@
 
 SET @SubscriberKey = _SubscriberKey
 SET @CurrentYear = Format(Now(), "yyyy")
+SE @Email = emailaddr
 
 /* From Contacts We get HasOptedOutOfEmail and et4ae5__HasOptedOutOfMobile__c and Status from Subscriber */
 
@@ -249,7 +250,9 @@ h2 {
 <p style="padding:20px;">SubscriberKey: %%=v(@SubscriberKey)=%%<br>
 Has Opted Out of Email: %%=v(@HasOptedOutOfEmail)=%%<br>
 Has Opted Out of Mobile: %%=v(@HasOptedOutOfMobile)=%%<br>
-Subscriber Status: %%=v(@subStatus)=%%</p>
+Subscriber Status: %%=v(@subStatus)=%%<br>
+Email: %%=v(@Email)=%%
+</p>
 
 %%[IF @Submit == "true" THEN ]%%
 <p style="padding:20px;">

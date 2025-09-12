@@ -3,7 +3,7 @@
 
 SET @SubscriberKey = _SubscriberKey
 SET @CurrentYear = Format(Now(), "yyyy")
-SE @Email = emailaddr
+SET  @Email = emailaddr
 
 /* From Contacts We get HasOptedOutOfEmail and et4ae5__HasOptedOutOfMobile__c and Status from Subscriber */
 
@@ -46,6 +46,8 @@ ENDIF
 
 IF @checkAll == "on" THEN
   SET @Action = "Unsubscribe from Email And SMS"
+
+  UpdateSFContact
 
   /* log unsubscribe event to mark as unsubscribed in All Subscribers */
   SET @reason = "Unsubscribed through custom subscription center"

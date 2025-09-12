@@ -352,6 +352,7 @@ h2 {
 
 <!-- Preview Testing Data -->
  <div style="background-color:red;color:#fff">
+  %%[ IF @Submit != "true" THEN ]%%
 <p style="padding:20px;">SubscriberKey: %%=v(@SubscriberKey)=%%<br>
 Has Opted Out of Email: %%=v(@HasOptedOutOfEmail)=%%<br>
 Has Opted Out of Mobile: %%=v(@HasOptedOutOfMobile)=%%<br>
@@ -359,7 +360,7 @@ Subscriber Status: %%=v(@subStatus)=%%<br>
 Email: %%=v(@Email)=%%
 </p>
 
-%%[IF @Submit == "true" THEN ]%%
+%%[ ELSE ]%%
 <p style="padding:20px;">
 SubscriberKey: %%=v(@SubscriberKey)=%%<br>
 Email: %%=v(@Email)=%%<br>

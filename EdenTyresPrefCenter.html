@@ -1,6 +1,8 @@
 <span style="display:none;">
 %%[
 
+SET @debug == "No"
+
 SET @SubscriberKey = _SubscriberKey
 SET @CurrentYear = Format(Now(), "yyyy")
 SET @Email = emailaddr
@@ -352,7 +354,8 @@ h2 {
 
 <!-- Preview Testing Data -->
  <div style="background-color:red;color:#fff">
-  %%[ IF @Submit != "true" THEN ]%%
+  %%[ IF @debug == "Yes" THEN
+  IF @Submit != "true" THEN ]%%
 <p style="padding:20px;">SubscriberKey: %%=v(@SubscriberKey)=%%<br>
 Has Opted Out of Email: %%=v(@HasOptedOutOfEmail)=%%<br>
 Has Opted Out of Mobile: %%=v(@HasOptedOutOfMobile)=%%<br>
@@ -368,7 +371,7 @@ Action: %%=v(@Action)=%%
 
 </p>
 
-%%[ ENDIF ]%%
+%%[ ENDIF ENDIF ]%%
 
  </div>
 

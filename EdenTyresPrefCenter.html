@@ -61,21 +61,24 @@ ELSE
 ENDIF
 
 
-
-
-
 /* Check Form Data POST Submission */
 
 SET @Submit = RequestParameter("Submit")
 
 IF @Submit == "true" THEN
   SET @SubscriberKey = RequestParameter("SubscriberKey")
-  SET @checkEmail = RequestParameter("checkEmail")
-  SET @checkSMS = RequestParameter("checkSMS")
-  SET @checkAll = RequestParameter("checkAll")
+  SET @Email = RequestParameter("Email")
+  SET @EmailUnsubscribe = RequestParameter("EmailUnsubscribe")
+  SET @SMSUnsubscribe = RequestParameter("SMSUnsubscribe")
+  SET @ALLUnsubscribe = RequestParameter("ALLUnsubscribe")
+
+  SET @EmailResubscribe = RequestParameter("EmailResubscribe")
+  SET @SMSResubscribe = RequestParameter("SMSResubscribe")
+  SET @AllResubscribe = RequestParameter("ALLResubscribe")
+
 ENDIF
 
-IF @checkAll == "on" THEN
+IF @ALLUnsubscribe == "on" THEN
   SET @Action = "Unsubscribe from Email And SMS"
 
   UpdateSFContact
@@ -103,12 +106,16 @@ IF @checkAll == "on" THEN
       "et4ae5__HasOptedOutOfMobile__c", "true"
      )
 
-
-
-ELSEIF @checkEmail == "on" THEN
+ELSEIF @EmailUnsubscribe == "on" THEN
   SET @Action = "Unsubscribe only from Email"
-ELSEIF @checkSMS == "on" THEN
+ELSEIF @SMSUnsubscribe == "on" THEN
   SET @Action = "Unsubscribe only from SMS"
+ELSEIF @AllResubscribe == "on" THEN
+  SET @Action = "Resubscribe to everything"
+ELSEIF @EmailResubscribe == "on" THEN
+  SET @Action = "Resubscribe only to email"
+ELSEIF @SMSResubscribe == "on" THEN
+  SET @Action = "Resubscribe only to SMS"
 ENDIF
 
 ]%%
@@ -351,6 +358,7 @@ exclusive offer, you can update your preferences here.</p>
   </div>
     <input type="hidden" name="Submit" value="true">
     <input type="hidden" name="SubscriberKey" value="%%=v(@SubscriberKey)=%%">
+    <input type="hidden" name="Email" value="%%=v(@Email)=%%">
   </form>
   </div> 
 </div>    

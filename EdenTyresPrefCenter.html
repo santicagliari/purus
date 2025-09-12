@@ -81,7 +81,31 @@ ENDIF
 IF @ALLUnsubscribe == "on" THEN
   SET @Action = "Unsubscribe from Email And SMS"
 
-  UpdateSFContact
+  /* log unsubscribe event to mark as unsubscribed in All Subscribers */
+  SET @reason = "Unsubscribed through custom subscription center"
+
+  SET @lue = CreateObject("ExecuteRequest")
+  SETObjectProperty(@lue,"Name","LogUnsubEvent")
+
+  SET @lue_prop = CreateObject("APIProperty")
+  SETObjectProperty(@lue_prop, "Name", "SubscriberKey")
+  SETObjectProperty(@lue_prop, "Value", @SubscriberKey)
+  AddObjectArrayItem(@lue, "Parameters", @lue_prop)
+
+  SET @lue_prop = CreateObject("APIProperty")
+  SETObjectProperty(@lue_prop, "Name", "Reason")
+  SETObjectProperty(@lue_prop, "Value", @reason)
+  AddObjectArrayItem(@lue, "Parameters", @lue_prop)
+
+  SET @lue_statusCode = InvokeExecute(@lue, @overallStatus, @requestId)
+
+  SET @updateRecord = UpdateSingleSalesforceObject(
+      "Contact", @SubscriberKey,
+      "et4ae5__HasOptedOutOfMobile__c", "true"
+     )
+
+ELSEIF @EmailUnsubscribe == "on" THEN
+  SET @Action = "Unsubscribe only from Email"
 
   /* log unsubscribe event to mark as unsubscribed in All Subscribers */
   SET @reason = "Unsubscribed through custom subscription center"
@@ -106,16 +130,44 @@ IF @ALLUnsubscribe == "on" THEN
       "et4ae5__HasOptedOutOfMobile__c", "true"
      )
 
-ELSEIF @EmailUnsubscribe == "on" THEN
-  SET @Action = "Unsubscribe only from Email"
 ELSEIF @SMSUnsubscribe == "on" THEN
   SET @Action = "Unsubscribe only from SMS"
+
+  SET @updateRecord = UpdateSingleSalesforceObject(
+      "Contact", @SubscriberKey,
+      "et4ae5__HasOptedOutOfMobile__c", "true"
+     )
+
 ELSEIF @AllResubscribe == "on" THEN
   SET @Action = "Resubscribe to everything"
+
+    SET @Subscriber = CreateObject("Subscriber")
+   SetObjectProperty(@Subscriber, "SubscriberKey", @SubscriberKey)
+   SetObjectProperty(@Subscriber, "EmailAddress", @email)
+   SetObjectProperty(@Subscriber, "Status", "Active" )
+   SET @Status = InvokeUpdate(@Subscriber, @createErrDesc, @createErrNo, @createOpts)
+
+  SET @updateRecord = UpdateSingleSalesforceObject(
+      "Contact", @SubscriberKey,
+      "et4ae5__HasOptedOutOfMobile__c", "false"
+     )
+
+
 ELSEIF @EmailResubscribe == "on" THEN
   SET @Action = "Resubscribe only to email"
+
+      SET @Subscriber = CreateObject("Subscriber")
+   SetObjectProperty(@Subscriber, "SubscriberKey", @SubscriberKey)
+   SetObjectProperty(@Subscriber, "EmailAddress", @email)
+   SetObjectProperty(@Subscriber, "Status", "Active" )
+   SET @Status = InvokeUpdate(@Subscriber, @createErrDesc, @createErrNo, @createOpts)
 ELSEIF @SMSResubscribe == "on" THEN
   SET @Action = "Resubscribe only to SMS"
+
+   SET @updateRecord = UpdateSingleSalesforceObject(
+      "Contact", @SubscriberKey,
+      "et4ae5__HasOptedOutOfMobile__c", "false"
+     )
 ENDIF
 
 ]%%

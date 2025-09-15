@@ -80,7 +80,7 @@ IF @Submit == "true" THEN
 
 ENDIF
 
-IF @ALLUnsubscribe == "on" THEN
+IF @ALLUnsubscribe == "on" OR (@EmailUnsubscribe == "on" AND @SMSUnsubscribe == "on") THEN
   SET @Action = "Unsubscribe from Email And SMS"
 
   /* log unsubscribe event to mark as unsubscribed in All Subscribers */
@@ -141,7 +141,7 @@ ELSEIF @SMSUnsubscribe == "on" THEN
       "et4ae5__HasOptedOutOfMobile__c", "true"
      )
 
-ELSEIF @AllResubscribe == "on" THEN
+ELSEIF @AllResubscribe == "on" OR (@EmailResubscribe == "on" AND @SMSResubscribe == "on") THEN
   SET @Action = "Resubscribe to everything"
 
   SET @Subscriber = CreateObject("Subscriber")

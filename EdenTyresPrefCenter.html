@@ -9,7 +9,11 @@ SET @Email = emailaddr
 
 /* From Contacts We get HasOptedOutOfEmail and et4ae5__HasOptedOutOfMobile__c and Status from Subscriber */
 
-SET @recordData = RetrieveSalesforceObjects("Contact", "HasOptedOutOfEmail, et4ae5__HasOptedOutOfMobile__c", "Id", "=", @SubscriberKey)
+IF INDEXOF(@SubscriberKey, "003") > 0 THEN
+
+  SET @recordData = RetrieveSalesforceObjects("Contact", "HasOptedOutOfEmail, et4ae5__HasOptedOutOfMobile__c", "Id", "=", @SubscriberKey)
+
+ENDIF
 
 IF RowCount(@recordData) > 0 THEN
     SET @HasOptedOutOfEmail = Field(Row(@recordData, 1), "HasOptedOutOfEmail")

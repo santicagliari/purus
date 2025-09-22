@@ -85,6 +85,8 @@ IF @Submit == "true" THEN
   SET @SMSResubscribe = RequestParameter("SMSResubscribe")
   SET @AllResubscribe = RequestParameter("ALLResubscribe")
 
+InsertData("CustomPreferenceCenterLog", "SubscriberKey", @SubscriberKey, "Email", @Email, "EmailUnsubscribe", @EmailUnsubscribe, "SMSUnsubscribe", @SMSUnsubscribe, "ALLUnsubscribe", @ALLUnsubscribe, "EmailResubscribe", @EmailResubscribe, "SMSResubscribe", @SMSResubscribe, "AllResubscribe", @AllResubscribe)  
+
 ENDIF
 
 IF @ALLUnsubscribe == "on" OR (@EmailUnsubscribe == "on" AND @SMSUnsubscribe == "on") THEN
